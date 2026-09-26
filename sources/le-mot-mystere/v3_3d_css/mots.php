@@ -1,0 +1,19 @@
+<?php
+
+$mots = [
+    "PROGRAMMATION",
+    "ORDINATEUR",
+    "DEVELOPPEMENT",
+    "AUTOMOBILE",
+    "MECANIQUE",
+    "ENTREPRENEUR",
+    "APPLICATION",
+    "INTELLIGENCE",
+    "ALGORITHME",
+    "INTERNET",
+    "TELEPHONE",
+    "CREATIVITE",
+    "MARKETING",
+    "BUSINESS",
+    "DIAGNOSTIC"
+];

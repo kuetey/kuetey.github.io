@@ -1,0 +1,936 @@
+/* =========================================================
+   LE MOT MYSTÈRE — v4 Three.js
+   Sommaire :
+   1. Variables        5. Cœurs
+   2. Base             6. Mot et lettres
+   3. Fond animé       7. Clavier
+   4. Carte de jeu     8. Résultat et boutons
+                       9. Responsive / accessibilité
+                      10. 3D en CSS (v3)
+                      11. Scène Three.js (v4)
+   ========================================================= */
+
+/* ---------- 1. VARIABLES ---------- */
+
+:root {
+    --violet: #6c4cff;
+    --violet-fonce: #34205f;
+    --rose: #ff5c93;
+    --jaune: #ffd95a;
+    --cyan: #3fd0ff;
+    --vert: #3fcf8e;
+    --rouge: #ff5a6e;
+    --creme: #fffaf0;
+    --gris: #e4e1eb;
+
+    --ombre-carte:
+        0 22px 0 rgba(52, 32, 95, 0.22),
+        0 40px 80px rgba(20, 8, 60, 0.45);
+
+    /* Position de la souris (mise à jour par js/effects.js) */
+    --mx: 50%;
+    --my: 30%;
+}
+
+/* ---------- 2. BASE ---------- */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    overflow-x: hidden;
+    font-family: "Baloo 2", "Segoe UI", sans-serif;
+    color: var(--violet-fonce);
+    background: #2a1766;
+}
+
+/* ---------- 3. FOND ANIMÉ ---------- */
+
+.background {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    background:
+        radial-gradient(ellipse at 50% 120%, #ff78a8 0%, transparent 55%),
+        linear-gradient(160deg, #3b22a8 0%, #6a3cc9 45%, #b04fb8 100%);
+}
+
+/* Aurora : de grosses taches de couleur floues qui dérivent lentement */
+.blob {
+    position: absolute;
+    width: 55vmax;
+    height: 55vmax;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.55;
+    mix-blend-mode: screen;
+    animation: drift 22s ease-in-out infinite alternate;
+}
+
+.blob-violet { background: #7b5cff; top: -20vmax; left: -15vmax; }
+.blob-rose   { background: #ff5c93; bottom: -25vmax; right: -15vmax; animation-delay: -6s; }
+.blob-cyan   { background: #3fd0ff; top: 10vmax; right: -25vmax; width: 40vmax; height: 40vmax; opacity: 0.4; animation-delay: -12s; }
+.blob-jaune  { background: #ffd95a; bottom: -20vmax; left: 5vmax; width: 30vmax; height: 30vmax; opacity: 0.3; animation-delay: -3s; }
+
+@keyframes drift {
+    0%   { transform: translate(0, 0) scale(1); }
+    50%  { transform: translate(6vmax, 4vmax) scale(1.12); }
+    100% { transform: translate(-4vmax, 7vmax) scale(0.95); }
+}
+
+/* Grille légère, qui s'efface vers les bords */
+.grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse at center, #000 20%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse at center, #000 20%, transparent 75%);
+}
+
+/* Étoiles qui scintillent (positions générées par PHP) */
+.stars span {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: var(--size);
+    height: var(--size);
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 6px #fff;
+    animation: twinkle 4s ease-in-out infinite;
+    animation-delay: var(--delay);
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0.15; transform: scale(0.7); }
+    50%      { opacity: 0.9;  transform: scale(1.2); }
+}
+
+/* Halo lumineux qui suit la souris */
+.spotlight {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(500px circle at var(--mx) var(--my), rgba(255, 255, 255, 0.14), transparent 60%);
+    transition: background 0.1s;
+}
+
+/* Voile rouge en cas de défaite */
+.defeat-tint {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 30%, rgba(200, 20, 60, 0.45));
+    opacity: 0;
+    transition: opacity 1.2s;
+}
+
+.etat-perdu .defeat-tint {
+    opacity: 1;
+}
+
+/* ---------- 4. CARTE DE JEU ---------- */
+
+.game-wrapper {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    perspective: 1400px;
+}
+
+.game-card {
+    position: relative;
+    width: min(1050px, 100%);
+    background: linear-gradient(180deg, #fffdf7, var(--creme));
+    border: 6px solid #fff;
+    border-radius: 36px;
+    padding: 28px;
+    box-shadow: var(--ombre-carte);
+
+    /* Inclinaison 3D pilotée par js/effects.js */
+    transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+    transition: transform 0.25s ease-out;
+    transform-style: preserve-3d;
+}
+
+/* Reflet brillant en haut de la carte */
+.game-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 30px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.5), transparent 35%);
+    pointer-events: none;
+}
+
+/* Le contenu passe au-dessus du reflet */
+.game-card > * {
+    position: relative;
+}
+
+.game-card.enter {
+    animation: card-enter 0.7s cubic-bezier(0.2, 1.3, 0.4, 1);
+}
+
+@keyframes card-enter {
+    from { opacity: 0; transform: translateY(40px) scale(0.94); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.game-card.shake {
+    animation: shake 0.45s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-10px) rotate(-0.6deg); }
+    40% { transform: translateX(8px) rotate(0.5deg); }
+    60% { transform: translateX(-5px); }
+    80% { transform: translateX(3px); }
+}
+
+.game-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.logo {
+    margin: 0;
+    font-family: "Fredoka", "Baloo 2", sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    line-height: 1;
+}
+
+.logo-text {
+    background: linear-gradient(90deg, var(--violet), var(--rose), var(--violet));
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: shimmer 5s linear infinite;
+}
+
+.logo-star {
+    display: inline-block;
+    color: var(--jaune);
+    text-shadow: 0 2px 0 #e5b92f;
+    animation: spin 6s linear infinite;
+}
+
+@keyframes shimmer {
+    to { background-position: 200% center; }
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.chips {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.chip {
+    padding: 6px 16px;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.chip-yellow { background: var(--jaune); box-shadow: 0 4px 0 #e5b92f; }
+.chip-cyan   { background: #c8f2ff; color: #11789b; box-shadow: 0 4px 0 #8fdcf5; }
+
+.game-content {
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: 28px;
+}
+
+.hangman-zone,
+.word-zone {
+    border-radius: 26px;
+    padding: 24px;
+}
+
+.hangman-zone {
+    background: linear-gradient(160deg, #e6ddff, #c9f3ff);
+    box-shadow: inset 0 -6px 0 rgba(52, 32, 95, 0.08);
+    text-align: center;
+}
+
+.word-zone {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    box-shadow: inset 0 0 0 3px #f0eafe;
+}
+
+.zone-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.mistakes {
+    background: var(--rouge);
+    color: #fff;
+    padding: 3px 13px;
+    border-radius: 20px;
+    box-shadow: 0 3px 0 #d63a52;
+}
+
+/* ---------- 5. CŒURS ---------- */
+.hearts {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.heart {
+    color: var(--rouge);
+    font-size: 28px;
+    line-height: 1;
+    text-shadow: 0 3px 0 #d63a52;
+    transition: 0.3s;
+}
+
+.heart.lost {
+    color: #d8d4e3;
+    text-shadow: none;
+    transform: scale(0.75);
+}
+
+.heart.breaking {
+    animation: heart-break 0.6s ease-out;
+}
+
+@keyframes heart-break {
+    0%   { color: var(--rouge); transform: scale(1.4); }
+    40%  { color: var(--rouge); transform: scale(1.5) rotate(-15deg); }
+    100% { color: #d8d4e3; transform: scale(0.75); }
+}
+
+/* ---------- 6. MOT ET LETTRES ---------- */
+
+.instruction {
+    margin: 0;
+    text-align: center;
+    color: #827b9c;
+    font-size: 17px;
+}
+
+/* Le mot reste sur une seule ligne : les cases rétrécissent selon la largeur
+   de la zone (unités "cqi" = % de la largeur du conteneur) */
+.word {
+    container-type: inline-size;
+    display: flex;
+    justify-content: center;
+    gap: clamp(3px, 1.2cqi, 8px);
+    margin: 22px 0 18px;
+}
+
+.letter {
+    display: grid;
+    place-items: center;
+    flex: 0 1 44px;
+    min-width: 0;
+    height: clamp(34px, 9cqi, 56px);
+    border-radius: clamp(6px, 2cqi, 12px);
+    background: #f3efff;
+    border-bottom: 5px solid #d6cef5;
+    font-family: "Fredoka", "Baloo 2", sans-serif;
+    font-size: clamp(15px, 5cqi, 32px);
+    font-weight: 700;
+}
+
+.letter.revealed {
+    background: #e7fbf2;
+    border-bottom-color: var(--vert);
+    color: #178a5a;
+}
+
+.letter.pop {
+    animation: letter-pop 0.5s cubic-bezier(0.3, 1.8, 0.5, 1);
+}
+
+@keyframes letter-pop {
+    0%   { transform: translateY(12px) scale(0.3); }
+    100% { transform: translateY(0) scale(1); }
+}
+
+/* Lettres révélées après une défaite */
+.letter.missed {
+    background: #ffe5e9;
+    border-bottom-color: var(--rouge);
+    color: var(--rouge);
+    animation: letter-pop 0.4s ease-out backwards;
+    animation-delay: calc(var(--i) * 60ms);
+}
+
+/* Victoire : les lettres brillent en vague */
+.etat-gagne .letter {
+    animation: letter-wave 1.6s ease-in-out infinite;
+    animation-delay: calc(var(--i) * 90ms);
+}
+
+@keyframes letter-wave {
+    0%, 60%, 100% { transform: translateY(0); box-shadow: none; }
+    30% {
+        transform: translateY(-10px);
+        box-shadow: 0 0 18px rgba(63, 207, 142, 0.8);
+        background: #fff;
+    }
+}
+
+.letters-title {
+    text-align: center;
+    color: var(--violet);
+    font-size: 15px;
+    font-weight: 800;
+    margin-bottom: 12px;
+}
+
+.letters-title small {
+    color: #a59fbd;
+    font-weight: 600;
+}
+
+/* ---------- 7. CLAVIER ---------- */
+
+.keyboard {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.keyboard-row {
+    display: flex;
+    justify-content: center;
+    gap: 7px;
+}
+
+.key {
+    flex: 0 1 46px;
+    min-width: 0;
+    height: 48px;
+    border: 0;
+    border-radius: 12px;
+    background: #eeeaff;
+    color: var(--violet-fonce);
+    font-family: "Fredoka", "Baloo 2", sans-serif;
+    font-size: 19px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 5px 0 #d2c9f2;
+    transition: transform 0.12s, box-shadow 0.12s, background 0.15s;
+}
+
+.key:hover:not(:disabled),
+.key:focus-visible {
+    background: var(--jaune);
+    transform: translateY(-3px) scale(1.06);
+    box-shadow: 0 8px 0 #e5b92f;
+    outline: none;
+}
+
+/* Appui (souris ou clavier physique grâce à la classe .pressed) */
+.key:active:not(:disabled),
+.key.pressed {
+    transform: translateY(4px);
+    box-shadow: 0 1px 0 #d2c9f2;
+}
+
+.key.correct {
+    background: var(--vert);
+    color: #fff;
+    box-shadow: 0 5px 0 #2aa872;
+}
+
+.key.wrong {
+    background: var(--gris);
+    color: #aaa4b7;
+    box-shadow: none;
+    text-decoration: line-through;
+}
+
+/* La touche qui vient d'être jouée : flash vert ou rouge → gris */
+.key.correct.just-played {
+    animation: key-good 0.6s ease-out;
+}
+
+.key.wrong.just-played {
+    animation: key-bad 1.2s ease-out;
+}
+
+@keyframes key-good {
+    0%   { transform: scale(1.25); box-shadow: 0 0 0 8px rgba(63, 207, 142, 0.35); }
+    100% { transform: scale(1); }
+}
+
+@keyframes key-bad {
+    0%, 45% { background: var(--rouge); color: #fff; transform: scale(1.1); }
+    100%    { background: var(--gris); color: #aaa4b7; transform: scale(1); }
+}
+
+.key:disabled {
+    cursor: default;
+}
+
+.keyboard.locked {
+    opacity: 0.45;
+    filter: grayscale(0.4);
+}
+
+/* ---------- 8. RÉSULTAT ET BOUTONS ---------- */
+
+.result {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+    padding: 14px 16px;
+    border-radius: 18px;
+    animation: result-in 0.6s cubic-bezier(0.3, 1.5, 0.5, 1);
+}
+
+@keyframes result-in {
+    from { opacity: 0; transform: scale(0.6) translateY(20px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.result-emoji {
+    font-size: 40px;
+    animation: wiggle 1.2s ease-in-out infinite;
+}
+
+@keyframes wiggle {
+    0%, 100% { transform: rotate(-10deg); }
+    50%      { transform: rotate(10deg); }
+}
+
+.result-text {
+    flex: 1;
+    font-size: 16px;
+    line-height: 1.3;
+}
+
+.result-text strong {
+    display: block;
+    font-family: "Fredoka", "Baloo 2", sans-serif;
+    font-size: 26px;
+}
+
+.success { background: #d9f9ea; color: #127a50; }
+.failure { background: #ffe0e5; color: #b8324f; }
+
+.btn {
+    border: 0;
+    border-radius: 14px;
+    font-family: inherit;
+    font-size: 18px;
+    font-weight: 800;
+    color: #fff;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+}
+
+.btn:hover,
+.btn:focus-visible {
+    transform: translateY(-2px);
+    filter: brightness(1.08);
+    outline: none;
+}
+
+.btn:active {
+    transform: translateY(3px);
+}
+
+.btn-play {
+    padding: 12px 20px;
+    background: linear-gradient(135deg, var(--violet), var(--rose));
+    box-shadow: 0 5px 0 #4932bd;
+    white-space: nowrap;
+    animation: pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 5px 0 #4932bd, 0 0 0 0 rgba(255, 92, 147, 0.5); }
+    50%      { box-shadow: 0 5px 0 #4932bd, 0 0 0 10px rgba(255, 92, 147, 0); }
+}
+
+.btn-new {
+    display: block;
+    width: 100%;
+    margin-top: 20px;
+    padding: 13px;
+    background: var(--violet);
+    box-shadow: 0 5px 0 #4932bd;
+}
+
+/* ---------- 9. RESPONSIVE / ACCESSIBILITÉ ---------- */
+
+@media (max-width: 800px) {
+    .game-content {
+        grid-template-columns: 1fr;
+    }
+
+    .game-card {
+        padding: 16px;
+        border-radius: 26px;
+    }
+
+    .game-header {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .logo {
+        font-size: 26px;
+    }
+}
+
+@media (max-width: 480px) {
+    .game-wrapper {
+        padding: 16px 10px;
+    }
+
+    .hangman-zone,
+    .word-zone {
+        padding: 14px;
+    }
+
+    /* Sur téléphone, on compacte le haut pour voir le clavier sans défiler */
+    .game-header {
+        margin-bottom: 14px;
+    }
+
+    .game-content {
+        gap: 14px;
+    }
+
+    .heart {
+        font-size: 22px;
+    }
+
+    .instruction,
+    .letters-title small {
+        display: none;
+    }
+
+    .word {
+        margin-top: 4px;
+    }
+
+    .logo-star {
+        display: none;
+    }
+
+    .keyboard-row {
+        gap: 4px;
+    }
+
+    .key {
+        height: 44px;
+        font-size: 16px;
+        border-radius: 9px;
+    }
+
+    .result {
+        flex-wrap: wrap;
+        justify-content: center;
+        text-align: center;
+    }
+}
+
+/* Si le système demande moins d'animations, on les coupe */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* =========================================================
+   10. 3D EN CSS (ajouts de la v3)
+   Rappels :
+   - perspective        : distance de "l'œil" ; plus elle est petite, plus la 3D est forte
+   - transform-style: preserve-3d : les enfants gardent leur position en 3D
+   - translateZ         : avance (+) ou recule (-) un élément vers l'écran
+   - backface-visibility: hidden : cache le dos d'un élément retourné
+   ========================================================= */
+
+:root {
+    --px: 0; /* position de la souris de -0.5 à 0.5 (js/effects.js) */
+    --py: 0;
+}
+
+/* ----- Titre en relief : plusieurs ombres empilées = une épaisseur ----- */
+
+.logo-text {
+    filter:
+        drop-shadow(0 1px 0 #d4c6ff)
+        drop-shadow(0 1px 0 #b9a4ff)
+        drop-shadow(0 1px 0 #9d82ff)
+        drop-shadow(0 4px 4px rgba(52, 32, 95, 0.35));
+}
+
+/* ----- Arrivée de la carte : elle bascule depuis le fond ----- */
+
+@keyframes card-enter {
+    from { opacity: 0; transform: translateY(60px) rotateX(28deg) scale(0.92); }
+    to   { opacity: 1; transform: none; }
+}
+
+/* ----- Lettres : cartes qui se retournent ----- */
+
+.letter,
+.letter.revealed,
+.letter.missed {
+    background: transparent;
+    border-bottom: 0;
+    perspective: 500px;
+}
+
+.letter.pop,
+.letter.missed {
+    animation: none;
+}
+
+.letter-inner {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+}
+
+.face {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    border-radius: inherit;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+.face-front {
+    background: #f3efff;
+    border-bottom: 5px solid #d6cef5;
+    color: #d3cbef;
+}
+
+/* Le dos est déjà retourné : il devient visible quand la carte fait un demi-tour */
+.face-back {
+    transform: rotateY(180deg);
+    background: #e7fbf2;
+    border-bottom: 5px solid var(--vert);
+    color: #178a5a;
+}
+
+.letter.revealed .letter-inner,
+.letter.missed .letter-inner {
+    transform: rotateY(180deg);
+}
+
+.letter.missed .face-back {
+    background: #ffe5e9;
+    border-bottom-color: var(--rouge);
+    color: var(--rouge);
+}
+
+.letter.pop .letter-inner {
+    animation: flip 0.7s cubic-bezier(0.3, 1.4, 0.5, 1);
+}
+
+.letter.missed .letter-inner {
+    animation: flip 0.6s ease-out backwards;
+    animation-delay: calc(var(--i) * 70ms);
+}
+
+@keyframes flip {
+    0%   { transform: rotateY(0deg); }
+    50%  { transform: rotateY(90deg) translateZ(20px) scale(1.15); }
+    100% { transform: rotateY(180deg); }
+}
+
+/* Victoire : vague en 3D */
+.etat-gagne .letter {
+    animation: wave-3d 1.6s ease-in-out infinite;
+    animation-delay: calc(var(--i) * 90ms);
+}
+
+.etat-gagne .face-back {
+    box-shadow: 0 0 16px rgba(63, 207, 142, 0.55);
+}
+
+@keyframes wave-3d {
+    0%, 60%, 100% { transform: none; }
+    30%           { transform: translateY(-10px) rotateX(-30deg); }
+}
+
+/* ----- Clavier posé comme un vrai clavier (incliné vers l'arrière) ----- */
+
+.keyboard {
+    transform: perspective(900px) rotateX(16deg);
+    transform-origin: center top;
+}
+
+.key {
+    box-shadow: 0 6px 0 #c9bff0, 0 10px 12px rgba(52, 32, 95, 0.16);
+}
+
+/* ----- Cœur qui tourne sur lui-même avant de s'éteindre ----- */
+
+.heart {
+    display: inline-block;
+}
+
+@keyframes heart-break {
+    0%   { color: var(--rouge); transform: scale(1.4) rotateY(0deg); }
+    60%  { color: var(--rouge); transform: scale(1.3) rotateY(540deg); }
+    100% { color: #d8d4e3; transform: scale(0.75) rotateY(720deg); }
+}
+
+/* ----- Message de fin qui bascule vers l'avant ----- */
+
+.result {
+    transform-origin: top center;
+}
+
+@keyframes result-in {
+    from { opacity: 0; transform: perspective(600px) rotateX(-85deg); }
+    to   { opacity: 1; transform: perspective(600px) rotateX(0deg); }
+}
+
+/* =========================================================
+   11. SCÈNE THREE.JS (v4)
+   Le pendu n'est plus un SVG : c'est une vraie scène 3D dessinée
+   dans un <canvas> par js/scene3d.js
+   ========================================================= */
+
+.hangman-zone {
+    background: linear-gradient(170deg, #26165f, #4f2ea6 55%, #8a47c2);
+    box-shadow: inset 0 -6px 0 rgba(0, 0, 0, 0.18);
+}
+
+.hangman-zone .zone-title {
+    color: #fff;
+}
+
+.scene3d {
+    position: relative;
+    height: 330px;
+    margin-top: 8px;
+    border-radius: 18px;
+    overflow: hidden;
+    cursor: grab;
+}
+
+.scene3d:active {
+    cursor: grabbing;
+}
+
+.scene3d canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.scene-hint {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 4px;
+    margin: 0;
+    text-align: center;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.55);
+    pointer-events: none;
+}
+
+/* Message si la 3D ne peut pas démarrer (WebGL désactivé, pas d'internet…) */
+.scene-error {
+    display: grid;
+    place-items: center;
+    height: 100%;
+    padding: 20px;
+    color: #fff;
+    text-align: center;
+}
+
+.hangman-zone .heart.lost {
+    color: rgba(255, 255, 255, 0.22);
+}
+
+@media (max-width: 800px) {
+    .scene3d {
+        height: 250px;
+    }
+}
+
+@media (max-width: 480px) {
+    .scene3d {
+        height: 190px;
+    }
+
+    .scene-hint {
+        display: none;
+    }
+}
+
+/* L'attribut HTML "hidden" doit gagner sur display: block (bouton Nouvelle partie) */
+[hidden] {
+    display: none !important;
+}
+
+/* Lien de retour vers le portfolio (uniquement dans la version en ligne) */
+.retour-portfolio {
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    z-index: 10;
+    padding: 8px 14px;
+    border-radius: 12px;
+    background: rgba(20, 10, 50, 0.55);
+    backdrop-filter: blur(8px);
+    color: #fff;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.retour-portfolio:hover {
+    background: rgba(20, 10, 50, 0.8);
+}
+
+@media (max-width: 480px) {
+    .retour-portfolio {
+        position: static;
+        display: inline-block;
+        margin: 10px 0 0 10px;
+    }
+}

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<!--
+    LE MOT MYSTÈRE — v4 Three.js
+
+    Différences avec les versions PHP :
+    - les règles sont en JavaScript (js/jeu.js) → aucun serveur PHP nécessaire ;
+    - le pendu est une scène 3D (js/scene3d.js) dessinée avec la bibliothèque Three.js ;
+    - la page n'est plus rechargée à chaque lettre : JavaScript met l'affichage à jour (js/main.js).
+-->
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Le Mot Mystère 3D</title>
+    <meta name="description" content="Jeu du pendu en 3D réalisé avec HTML, CSS, JavaScript et Three.js.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Fredoka:wght@600;700&display=swap">
+    <link rel="stylesheet" href="style.css">
+
+    <!-- "importmap" : indique au navigateur où trouver Three.js quand on écrit import ... from "three" -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+            }
+        }
+    </script>
+</head>
+
+<body class="etat-en_cours">
+
+<!-- ===== FOND ANIMÉ (identique à la v2) ===== -->
+<div class="background" aria-hidden="true">
+    <div class="aurora">
+        <span class="blob blob-violet"></span>
+        <span class="blob blob-rose"></span>
+        <span class="blob blob-cyan"></span>
+        <span class="blob blob-jaune"></span>
+    </div>
+    <div class="grid"></div>
+    <div class="stars" id="stars"></div>
+    <div class="spotlight"></div>
+    <div class="defeat-tint"></div>
+</div>
+
+<main class="game-wrapper">
+
+    <section class="game-card enter" id="card">
+
+        <header class="game-header">
+            <h1 class="logo">
+                <span class="logo-star">✦</span>
+                <span class="logo-text">LE MOT MYSTÈRE</span>
+                <span class="logo-star">✦</span>
+            </h1>
+            <div class="chips">
+                <span class="chip chip-yellow" id="nb-lettres">… lettres</span>
+                <span class="chip chip-cyan">Édition 3D</span>
+            </div>
+        </header>
+
+        <div class="game-content">
+
+            <!-- ===== ZONE 3D ===== -->
+            <div class="hangman-zone">
+                <div class="zone-title">
+                    <span>LE PENDU</span>
+                    <span class="mistakes" id="erreurs">0 / 6</span>
+                </div>
+
+                <div class="scene3d" id="scene3d">
+                    <p class="scene-hint">↔ Fais glisser pour tourner autour</p>
+                </div>
+
+                <div class="hearts" id="coeurs"></div>
+            </div>
+
+            <!-- ===== ZONE DU MOT ET DU CLAVIER (remplie par js/main.js) ===== -->
+            <div class="word-zone">
+                <p class="instruction">Trouve le mot avant que le personnage soit complet !</p>
+
+                <div class="word" id="mot" aria-live="polite"></div>
+
+                <div id="message"></div>
+
+                <div class="keyboard" id="clavier"></div>
+
+                <button class="btn btn-new" type="button" id="bouton-nouvelle">↻ Nouvelle partie</button>
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+<script src="js/effects.js"></script>
+<script type="module" src="js/main.js"></script>
+
+</body>
+</html>
