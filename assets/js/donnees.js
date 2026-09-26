@@ -15,19 +15,16 @@ export const DEPOT = "https://github.com/kuetey/kuetey.github.io";
 export const PARCOURS = [
     {
         titre: "Réussir ma formation",
-        periode: "", // ex : "2024"
         statut: "termine",
         modules: ["Expérience Studi", "Organisation", "Immersion professionnelle", "Préparer les examens"],
     },
     {
         titre: "Les fondamentaux du développement",
-        periode: "", // ex : "2024"
         statut: "en-cours",
         modules: ["Écosystème et outils", "Introduction à la programmation", "Algorithmes", "Tris et recherche", "Récursivité"],
     },
     {
         titre: "Front-end",
-        periode: "", // ex : "2024"
         statut: "a-venir",
         modules: [
             "Figma", "HTML & CSS", "WordPress", "JavaScript", "Git & GitHub", "Déploiement",
@@ -36,7 +33,6 @@ export const PARCOURS = [
     },
     {
         titre: "Back-end & moteurs de jeu",
-        periode: "", // ex : "2024"
         statut: "a-venir",
         modules: [
             "Bases de données", "PHP dynamique", "SQL", "Symfony", "Sécurité", "Tests",
@@ -46,7 +42,6 @@ export const PARCOURS = [
     },
     {
         titre: "Bases de données web",
-        periode: "", // ex : "2024"
         statut: "a-venir",
         modules: ["Modélisation", "Requêtes", "Optimisation"],
     },
@@ -56,7 +51,7 @@ export const PROJETS = [
     {
         id: "mot-mystere",
         titre: "Le Mot Mystère",
-        accroche: "Un jeu du pendu que je fais évoluer version après version : de la console PHP jusqu'à une scène 3D.",
+        accroche: "Un jeu du pendu que je fais évoluer version après version : d'une page PHP à une interface de jeu animée, puis à une scène 3D temps réel.",
         versions: [
             {
                 nom: "v1 — Ma version",
@@ -112,8 +107,10 @@ export const A_VENIR = [
 ];
 
 export const COMPETENCES = [
-    { groupe: "Front-end", items: [["HTML", "acquis"], ["CSS / animations", "acquis"], ["SVG", "acquis"], ["JavaScript", "en-cours"], ["Three.js", "en-cours"], ["Responsive", "acquis"]] },
+    { groupe: "Interfaces", items: [["UI responsive", "acquis"], ["Animations / micro-interactions", "acquis"], ["Design system (couleurs, typo)", "en-cours"], ["Figma", "a-venir"]] },
+    { groupe: "3D temps réel", items: [["3D en CSS", "acquis"], ["Three.js / WebGL", "en-cours"], ["Unity 3D", "a-venir"], ["Shaders", "a-venir"]] },
+    { groupe: "Front-end", items: [["HTML", "acquis"], ["CSS / animations", "acquis"], ["SVG", "acquis"], ["JavaScript", "en-cours"]] },
     { groupe: "Back-end", items: [["PHP", "en-cours"], ["Sessions / formulaires", "acquis"], ["SQL", "a-venir"], ["Symfony", "a-venir"]] },
-    { groupe: "Jeu vidéo", items: [["Logique de jeu", "en-cours"], ["Phaser", "a-venir"], ["Unity / C#", "a-venir"], ["Shader Graph", "a-venir"]] },
+    { groupe: "Jeu vidéo", items: [["Logique de jeu", "en-cours"], ["Phaser", "a-venir"], ["Unity / C#", "a-venir"]] },
     { groupe: "Outils", items: [["Git", "en-cours"], ["GitHub Pages", "en-cours"], ["VS Code", "acquis"], ["Docker", "a-venir"]] },
 ];

@@ -26,7 +26,7 @@ function afficherParcours() {
             <div class="step-head">
                 <h3><span class="step-num">Bloc ${i + 1}</span>${texte(bloc.titre)}</h3>
                 <span class="status ${bloc.statut}">
-                    ${LIBELLES_STATUT[bloc.statut]}${bloc.periode ? ` · ${texte(bloc.periode)}` : ""}
+                    ${LIBELLES_STATUT[bloc.statut]}
                 </span>
             </div>
             <ul class="chips">
@@ -210,4 +210,3 @@ afficherAutresProjets();
 afficherCompetences();
 gererNavigation();
 gererApparitions();
-document.getElementById("annee").textContent = new Date().getFullYear();

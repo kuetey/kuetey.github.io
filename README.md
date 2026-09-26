@@ -1,6 +1,6 @@
 # kuetey.github.io
 
-Mon portfolio de développeur web & gaming, construit tout au long de ma formation **Graduate Développeur Web Gaming** chez Studi (2023 → 2029).
+**Mon parcours chez Studi** : le portfolio d'un créateur d'interfaces et de jeux 3D, en formation **Graduate Développeur Web Gaming**.
 
 🌐 **En ligne : https://kuetey.github.io**
 
