@@ -7,6 +7,18 @@
  *
  * La deuxième partie du fichier compose une MUSIQUE DE FOND western,
  * elle aussi jouée note par note par le code.
+ *
+ * ---------------------------------------------------------------------------
+ * CE QUE CE FICHIER M'A APPRIS
+ * - La Web Audio API : fabriquer des sons avec des oscillateurs, du bruit et des filtres.
+ * - Les enveloppes de volume (attaque, déclin) avec les « rampes » de gain.
+ * - Composer une musique en code : grille d'accords, mélodie en notes MIDI, tempo et swing.
+ * - L'algorithme de Karplus-Strong : du bruit qui tourne en boucle devient une corde pincée.
+ * - La réverbération par convolution avec une « empreinte » de bruit qui s'éteint.
+ * - Programmer des notes à l'avance (lookahead) pour un rythme régulier malgré setInterval.
+ * - Séparer les volumes (musique / effets) avec des nœuds de gain, et mémoriser le réglage (localStorage).
+ * - Respecter les règles des navigateurs : pas de son avant une action du joueur.
+ * ---------------------------------------------------------------------------
  */
 
 let contexte = null;

@@ -15,6 +15,18 @@
  *
  * Les clics sont détectés avec un Raycaster : un rayon part de la souris
  * vers la scène, et on regarde quel objet il touche en premier.
+ *
+ * ---------------------------------------------------------------------------
+ * CE QUE CE FICHIER M'A APPRIS
+ * - Une interface de jeu en 3D accrochée à la caméra : elle reste fixe à l'écran.
+ * - Calculer la taille visible à une distance donnée (trigonométrie avec le champ de vision)
+ *   pour placer et redimensionner chaque élément selon l'écran (ordinateur, tablette, mobile).
+ * - Le raycasting : savoir quel objet 3D se trouve sous la souris ou le doigt.
+ * - Gérer survol, appui et relâchement comme de vrais boutons (pointerdown / pointerup).
+ * - Shape + ExtrudeGeometry : dessiner une forme 2D avec des trous et lui donner du volume (le barillet).
+ * - Mesurer un groupe d'objets avec Box3 pour connaître sa taille réelle.
+ * - Des animations au ressort partout (touches, tuiles, bannière) pour un rendu de jeu vidéo.
+ * ---------------------------------------------------------------------------
  */
 
 import * as THREE from "three";

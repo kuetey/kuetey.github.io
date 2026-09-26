@@ -2,6 +2,17 @@
  * decor.js — le Far West au coucher du soleil
  * Ciel dégradé (shader), dunes, mesas, soleil, saloon, cactus, tonneaux,
  * château d'eau, virevoltant, vautours et poussière.
+ *
+ * ---------------------------------------------------------------------------
+ * CE QUE CE FICHIER M'A APPRIS
+ * - Un shader (GLSL) pour le ciel : la couleur de chaque pixel dépend de sa hauteur.
+ * - Déformer une géométrie point par point (les dunes), puis recalculer les normales.
+ * - Construire des bâtiments et des objets avec des boîtes et des cylindres, plus des contours BD.
+ * - Les ambiances : faire glisser doucement les couleurs du ciel, du brouillard et des lumières.
+ * - Le brouillard (Fog) pour donner de la profondeur et cacher la fin du monde.
+ * - Des éléments vivants et peu coûteux : virevoltant, vautours, poussière (Points).
+ * - Adapter la qualité (taille des ombres, nombre de particules) aux appareils mobiles.
+ * ---------------------------------------------------------------------------
  */
 
 import * as THREE from "three";

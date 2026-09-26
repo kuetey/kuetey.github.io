@@ -10,6 +10,19 @@
  *
  * Ce fichier exporte creerScene(), qui renvoie les commandes utilisées par main.js :
  * ajouterPartie(), bonneLettre(), humeur(), victoire(), defaite(), reinitialiser().
+ *
+ * ---------------------------------------------------------------------------
+ * CE QUE CE FICHIER M'A APPRIS
+ * - Les bases de Three.js : scène, caméra, renderer, lumières, Mesh = géométrie + matériau.
+ * - Construire un personnage avec des formes simples (sphères, capsules) groupées (Group).
+ * - Les pivots : faire tourner un bras autour de l'épaule en le plaçant dans un groupe décalé.
+ * - Le style cartoon : MeshToonMaterial avec un dégradé de seulement 3 tons.
+ * - Les ombres portées (castShadow / receiveShadow) et leur réglage.
+ * - Une animation « ressort » codée à la main (vitesse + amortissement) pour un effet vivant.
+ * - Une petite physique pour les confettis : gravité, frottement de l'air, durée de vie.
+ * - OrbitControls pour tourner autour de la scène, avec des limites.
+ * - Exposer une API claire (ajouterPartie, victoire…) pour que main.js n'ait pas à connaître la 3D.
+ * ---------------------------------------------------------------------------
  */
 
 import * as THREE from "three";

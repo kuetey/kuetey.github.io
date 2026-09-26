@@ -4,6 +4,15 @@
  * - demande à jeu.js d'appliquer les règles ;
  * - met à jour la page (mot, clavier, cœurs, message) ;
  * - prévient la scène 3D de ce qui s'est passé.
+ *
+ * ---------------------------------------------------------------------------
+ * CE QUE CE FICHIER M'A APPRIS
+ * - Passer d'une page qui se recharge (PHP) à une page qui se met à jour elle-même (DOM).
+ * - Créer des éléments en JavaScript (createElement, appendChild) et gérer des événements (click, keydown).
+ * - Relancer une animation CSS : retirer la classe, lire offsetWidth, puis remettre la classe.
+ * - Garder l'idée de la « dernière action » de la v2 pour n'animer que ce qui change.
+ * - Prévoir un plan B : si la 3D ne démarre pas (try / catch), le jeu reste jouable.
+ * ---------------------------------------------------------------------------
  */
 
 import { MOTS } from "./mots.js";
@@ -205,7 +214,7 @@ function demarrer() {
 /* ---------- Clavier physique (repris de keyboard.js de la v2) ---------- */
 
 function lettreSansAccent(texte) {
-    return texte.normalize("NFD").replace(/[̀-ͯ]/g, "").toUpperCase();
+    return texte.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
 }
 
 document.addEventListener("keydown", (evenement) => {

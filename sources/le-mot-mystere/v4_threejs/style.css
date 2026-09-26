@@ -10,6 +10,15 @@
                       11. Scène Three.js (v4)
    ========================================================= */
 
+/*
+   ---------------------------------------------------------------------------
+   CE QUE CE FICHIER M'A APPRIS
+   - Réutiliser le style des versions précédentes et en retirer ce qui ne sert plus (le SVG).
+   - Afficher un canvas Three.js dans une zone de page qui reste responsive.
+   - L'attribut HTML hidden peut être écrasé par un display: block : il faut le protéger en CSS.
+   ---------------------------------------------------------------------------
+*/
+
 /* ---------- 1. VARIABLES ---------- */
 
 :root {

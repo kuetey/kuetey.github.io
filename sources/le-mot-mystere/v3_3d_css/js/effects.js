@@ -3,6 +3,13 @@
  * 1. Halo lumineux du fond qui suit la souris
  * 2. Légère inclinaison 3D de la carte + rotation de la scène 3D du pendu (v3)
  * 3. Conservation de la position de défilement entre deux coups (utile sur mobile)
+ *
+ * ---------------------------------------------------------------------------
+ * CE QUE CE FICHIER M'A APPRIS
+ * - Envoyer la position de la souris au CSS sous forme de nombres (--px, --py)
+ *   pour que la scène 3D tourne avec calc(var(--px) * 28deg).
+ * - Revenir à une position neutre quand la souris quitte la fenêtre (mouseleave).
+ * ---------------------------------------------------------------------------
  */
 
 const moinsDAnimations = window.matchMedia("(prefers-reduced-motion: reduce)").matches;

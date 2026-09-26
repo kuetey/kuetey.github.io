@@ -3,6 +3,12 @@
  * 1. Halo lumineux du fond qui suit la souris
  * 2. Légère inclinaison 3D de la carte
  * (La conservation du défilement de la v2 n'est plus utile : la page ne se recharge plus.)
+ *
+ * ---------------------------------------------------------------------------
+ * CE QUE CE FICHIER M'A APPRIS
+ * - Simplifier un fichier quand le besoin change : sans rechargement de page,
+ *   la sauvegarde du défilement de la v2 n'est plus utile.
+ * ---------------------------------------------------------------------------
  */
 
 const moinsDAnimations = window.matchMedia("(prefers-reduced-motion: reduce)").matches;

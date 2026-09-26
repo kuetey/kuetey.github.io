@@ -4,6 +4,16 @@
    la page plein écran et l'écran de chargement.
    ========================================================= */
 
+/*
+   ---------------------------------------------------------------------------
+   CE QUE CE FICHIER M'A APPRIS
+   - Préparer une page plein écran pour un jeu : pas de défilement, pas de zoom au double-tap
+     (touch-action), pas de sélection de texte.
+   - Un écran de chargement qui disparaît en fondu avec une transition CSS.
+   - Une classe « sr-only » : du texte invisible à l'écran mais lu par les lecteurs d'écran.
+   ---------------------------------------------------------------------------
+*/
+
 * {
     box-sizing: border-box;
 }

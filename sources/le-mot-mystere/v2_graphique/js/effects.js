@@ -3,6 +3,15 @@
  * 1. Halo lumineux du fond qui suit la souris
  * 2. Légère inclinaison 3D de la carte
  * 3. Conservation de la position de défilement entre deux coups (utile sur mobile)
+ *
+ * ---------------------------------------------------------------------------
+ * CE QUE CE FICHIER M'A APPRIS
+ * - Écouter un événement (mousemove) et en tirer une position en pourcentage de l'écran.
+ * - Passer des valeurs du JavaScript au CSS avec des variables : style.setProperty("--rx", …).
+ * - matchMedia() : adapter le comportement (écran tactile, animations réduites).
+ * - sessionStorage pour retrouver la position de défilement après un rechargement,
+ *   avec try / catch car le stockage peut être indisponible (navigation privée).
+ * ---------------------------------------------------------------------------
  */
 
 const moinsDAnimations = window.matchMedia("(prefers-reduced-motion: reduce)").matches;

@@ -8,6 +8,20 @@
                        9. Responsive / accessibilité
    ========================================================= */
 
+/*
+   ---------------------------------------------------------------------------
+   CE QUE CE FICHIER M'A APPRIS
+   - Les variables CSS (--violet, --rose…) : une couleur définie une fois, réutilisée partout.
+   - Les animations @keyframes et leur déclenchement par une simple classe ajoutée par PHP
+     (shake, pop, new…) : PHP décide QUAND, le CSS décide COMMENT.
+   - Animer un tracé SVG : pathLength="1" + stroke-dasharray / stroke-dashoffset = effet de dessin.
+   - Le fond « aurora » : des cercles très flous (filter: blur) qui bougent lentement.
+   - Le responsive avec @media, et clamp() pour des tailles qui s'adaptent à l'écran.
+   - Les unités de conteneur (cqi) : des lettres qui rétrécissent selon la largeur de leur zone.
+   - Respecter prefers-reduced-motion : couper les animations pour qui le demande.
+   ---------------------------------------------------------------------------
+*/
+
 /* ---------- 1. VARIABLES ---------- */
 
 :root {

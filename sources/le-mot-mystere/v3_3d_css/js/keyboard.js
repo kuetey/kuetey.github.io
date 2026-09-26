@@ -3,13 +3,19 @@
  * - Taper une lettre = cliquer sur la touche correspondante du clavier virtuel
  * - Les accents sont acceptés : é, è, ê → E, ç → C…
  * - Entrée = rejouer quand la partie est terminée
+ *
+ * ---------------------------------------------------------------------------
+ * CE QUE CE FICHIER M'A APPRIS
+ * - Réutiliser un fichier d'une version à l'autre sans modification :
+ *   le clavier physique fonctionne de la même manière qu'en v2.
+ * ---------------------------------------------------------------------------
  */
 
 let coupEnCours = false; // évite d'envoyer deux lettres pendant le rechargement
 
 function lettreSansAccent(texte) {
     // "é" devient "e" + accent séparé, puis on supprime l'accent
-    return texte.normalize("NFD").replace(/[̀-ͯ]/g, "").toUpperCase();
+    return texte.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
 }
 
 document.addEventListener("keydown", (evenement) => {

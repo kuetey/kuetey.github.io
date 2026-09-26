@@ -3,6 +3,15 @@
  *
  * Ordre d'apparition des parties (une par erreur) :
  * 1 tête + chapeau · 2 corps · 3 bras gauche · 4 bras droit · 5 jambe gauche · 6 jambe droite
+ *
+ * ---------------------------------------------------------------------------
+ * CE QUE CE FICHIER M'A APPRIS
+ * - Organiser un personnage en hiérarchie : pendu > tête > chapeau, pendu > bras (pivot) > main.
+ * - Détacher un objet de son parent sans qu'il saute (scene.attach) pour le faire voler.
+ * - Une petite physique : gravité, rebonds amortis sur l'estrade et le sol.
+ * - Des humeurs qui changent le visage en montrant / cachant des éléments.
+ * - Des états de jeu (jeu, victoire, défaite) qui pilotent les animations.
+ * ---------------------------------------------------------------------------
  */
 
 import * as THREE from "three";

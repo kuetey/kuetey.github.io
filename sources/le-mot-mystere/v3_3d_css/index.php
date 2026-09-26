@@ -5,6 +5,15 @@
  *
  * PHP garde toutes les règles du jeu (mot, lettres, erreurs, victoire, défaite).
  * Le CSS s'occupe de l'apparence, le JavaScript (dossier js/) des petits effets.
+ *
+ * ---------------------------------------------------------------------------
+ * CE QUE CE FICHIER M'A APPRIS
+ * - Faire évoluer un projet sans le casser : la v3 est une copie de la v2, seules
+ *   quelques parties du HTML changent (calques de la scène, cartes des lettres).
+ * - Découper un dessin SVG en deux calques pour créer un effet de profondeur (parallaxe).
+ * - Structurer une carte à deux faces en HTML (face avant « ? », face arrière = la lettre).
+ * - Garder PHP pour la logique : la 3D n'est qu'une question d'affichage (CSS).
+ * ---------------------------------------------------------------------------
  */
 
 // Nom de session propre à cette version : elle ne se mélange pas avec la v1 et la v2

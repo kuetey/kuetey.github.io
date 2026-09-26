@@ -1,5 +1,14 @@
 /*
  * outils.js — petites fonctions réutilisées par tous les fichiers 3D
+ *
+ * ---------------------------------------------------------------------------
+ * CE QUE CE FICHIER M'A APPRIS
+ * - Factoriser : regrouper les petites fonctions utilisées par plusieurs fichiers.
+ * - Un ressort physique (raideur, amortissement) indépendant du nombre d'images par seconde,
+ *   grâce au temps écoulé dt.
+ * - approcher() : un lissage exponentiel qui donne le même résultat à 30 ou à 144 images par seconde.
+ * - Détecter si un paramètre est déjà un matériau (instanceof) pour accepter deux types d'entrée.
+ * ---------------------------------------------------------------------------
  */
 
 import * as THREE from "three";

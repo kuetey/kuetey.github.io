@@ -4,6 +4,16 @@
  *
  * Avantage : aucune image à télécharger, et on peut écrire n'importe quel texte
  * avec les polices western chargées depuis Google Fonts.
+ *
+ * ---------------------------------------------------------------------------
+ * CE QUE CE FICHIER M'A APPRIS
+ * - Dessiner dans un <canvas> 2D (dégradés, texte, formes) et s'en servir comme texture 3D.
+ * - Attendre qu'une police soit chargée (document.fonts.load) avant de dessiner du texte.
+ * - Un générateur pseudo-aléatoire « à graine » : le même bois est redessiné à l'identique.
+ * - Mettre en cache (Map) ce qui est coûteux à fabriquer : une texture par lettre, pas plus.
+ * - Réduire automatiquement la taille d'un texte trop long (measureText).
+ * - Les espaces de couleurs : une texture de couleur doit être déclarée en SRGBColorSpace.
+ * ---------------------------------------------------------------------------
  */
 
 import * as THREE from "three";

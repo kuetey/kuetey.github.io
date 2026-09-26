@@ -9,6 +9,19 @@
                       10. 3D en CSS (ajouts de la v3)
    ========================================================= */
 
+/*
+   ---------------------------------------------------------------------------
+   CE QUE CE FICHIER M'A APPRIS
+   - La 3D en CSS sans bibliothèque : perspective (distance de l'œil),
+     transform-style: preserve-3d (les enfants restent en 3D) et translateZ (avancer / reculer).
+   - rotateX / rotateY pilotés par des variables CSS mises à jour par JavaScript.
+   - backface-visibility: hidden pour fabriquer une carte qui se retourne.
+   - Poser un plan « au sol » avec rotateX(90deg) et le masquer en dégradé (mask-image).
+   - Un relief de titre avec plusieurs drop-shadow empilés.
+   - Surcharger proprement une feuille existante : les règles v3 sont ajoutées à la fin.
+   ---------------------------------------------------------------------------
+*/
+
 /* ---------- 1. VARIABLES ---------- */
 
 :root {
