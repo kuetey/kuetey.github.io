@@ -122,9 +122,6 @@ async function demarrerApplication() {
             jouer: lancerPartie,
             lettre: jouer,
             nouvellePartie: recommencer,
-            basculerSon() {
-                ui.changerSon(sons.basculer());
-            },
         },
     });
 
@@ -270,6 +267,16 @@ async function demarrerApplication() {
 
         annoncer();
     }
+
+    /* ---------- Musique : démarre à la première action (règle des navigateurs) ---------- */
+
+    function premiereAction() {
+        sons.demarrerMusique();
+        window.removeEventListener("pointerdown", premiereAction);
+        window.removeEventListener("keydown", premiereAction);
+    }
+    window.addEventListener("pointerdown", premiereAction);
+    window.addEventListener("keydown", premiereAction);
 
     /* ---------- Clavier physique ---------- */
 

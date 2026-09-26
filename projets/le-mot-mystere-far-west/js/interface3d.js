@@ -290,22 +290,76 @@ export function creerInterface({ camera, canvas, sons, actions }) {
     const barillet = new THREE.Group();
     barilletRacine.add(barillet);
 
-    const tambour = new THREE.Mesh(new THREE.CylinderGeometry(0.95, 0.95, 0.5, 40), MAT.acierFonce);
-    tambour.rotation.x = Math.PI / 2;
-    const axe = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.6, 16), MAT.acier);
+    /*
+     * Un vrai barillet : on dessine sa forme en 2D (Shape) puis on lui donne
+     * de l'épaisseur (ExtrudeGeometry).
+     * - le contour a 6 rainures creusées entre les chambres (comme un Colt) ;
+     * - 6 trous (les chambres) + le trou de l'axe sont découpés dans la forme.
+     * Quand une balle est tirée, on voit la chambre vide.
+     */
+    const RAYON = 0.95;
+    const RAYON_CHAMBRES = 0.56;
+    const RAYON_TROU = 0.235;
+    const angleChambre = (k) => Math.PI / 2 + (k * Math.PI) / 3;
+
+    const forme = new THREE.Shape();
+    const nbPoints = 180;
+    for (let i = 0; i <= nbPoints; i++) {
+        const theta = (i / nbPoints) * Math.PI * 2;
+        // Rainure au milieu de deux chambres : cos(6θ) vaut 1 à ces angles précis
+        const rainure = Math.pow(Math.max(0, Math.cos(6 * (theta - angleChambre(0) - Math.PI / 6))), 10);
+        const r = RAYON - 0.13 * rainure;
+        const x = Math.cos(theta) * r;
+        const y = Math.sin(theta) * r;
+        if (i === 0) forme.moveTo(x, y);
+        else forme.lineTo(x, y);
+    }
+    for (let k = 0; k < 6; k++) {
+        const trou = new THREE.Path();
+        const a = angleChambre(k);
+        trou.absarc(Math.cos(a) * RAYON_CHAMBRES, Math.sin(a) * RAYON_CHAMBRES, RAYON_TROU, 0, Math.PI * 2, true);
+        forme.holes.push(trou);
+    }
+    const trouAxe = new THREE.Path();
+    trouAxe.absarc(0, 0, 0.11, 0, Math.PI * 2, true);
+    forme.holes.push(trouAxe);
+
+    const geoTambour = new THREE.ExtrudeGeometry(forme, {
+        depth: 0.5, bevelEnabled: true, bevelThickness: 0.04, bevelSize: 0.03, bevelSegments: 3, curveSegments: 32,
+    });
+    geoTambour.translate(0, 0, -0.25); // centre le cylindre sur z = 0
+    const tambour = new THREE.Mesh(geoTambour, MAT.acierFonce);
+
+    // Fond des chambres : parois intérieures et fond sombres (profondeur du trou)
+    const matInterieur = new THREE.MeshStandardMaterial({ color: 0x0b0b0e, roughness: 0.9, side: THREE.DoubleSide });
+    for (let k = 0; k < 6; k++) {
+        const a = angleChambre(k);
+        const paroi = new THREE.Mesh(new THREE.CylinderGeometry(RAYON_TROU, RAYON_TROU, 0.5, 24, 1, true), matInterieur);
+        paroi.rotation.x = Math.PI / 2;
+        paroi.position.set(Math.cos(a) * RAYON_CHAMBRES, Math.sin(a) * RAYON_CHAMBRES, 0);
+        barillet.add(paroi);
+    }
+    const fond = new THREE.Mesh(new THREE.CircleGeometry(RAYON - 0.05, 40), matInterieur);
+    fond.position.z = -0.22;
+    const axe = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.62, 16), MAT.acier);
     axe.rotation.x = Math.PI / 2;
-    barillet.add(tambour, axe);
+    barillet.add(tambour, fond, axe);
 
     const balles = [];
     for (let k = 0; k < 6; k++) {
-        const angle = Math.PI / 2 + (k * Math.PI) / 3;
+        const angle = angleChambre(k);
         const balle = new THREE.Group();
-        const douille = new THREE.Mesh(new THREE.CylinderGeometry(0.21, 0.21, 0.54, 20), MAT.laiton);
+        const douille = new THREE.Mesh(new THREE.CylinderGeometry(0.215, 0.215, 0.54, 24), MAT.laiton);
         douille.rotation.x = Math.PI / 2;
-        const culot = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.56, 12), MAT.acier);
-        culot.rotation.x = Math.PI / 2;
-        balle.add(douille, culot);
-        const origine = new THREE.Vector3(Math.cos(angle) * 0.56, Math.sin(angle) * 0.56, 0.04);
+        // Bourrelet du culot, un peu plus large que le trou : la balle "tient" dans la chambre
+        const bourrelet = new THREE.Mesh(new THREE.CylinderGeometry(0.255, 0.255, 0.04, 24), MAT.laiton);
+        bourrelet.rotation.x = Math.PI / 2;
+        bourrelet.position.z = 0.27;
+        const amorce = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.075, 0.02, 16), MAT.acier);
+        amorce.rotation.x = Math.PI / 2;
+        amorce.position.z = 0.29;
+        balle.add(douille, bourrelet, amorce);
+        const origine = new THREE.Vector3(Math.cos(angle) * RAYON_CHAMBRES, Math.sin(angle) * RAYON_CHAMBRES, 0.04);
         balle.position.copy(origine);
         barillet.add(balle);
         balles.push({ balle, origine, envol: null });
@@ -326,9 +380,81 @@ export function creerInterface({ camera, canvas, sons, actions }) {
 
     const coinRacine = new THREE.Group();
     const boutonNouvelle = creerBouton("NOUVELLE PARTIE", { largeur: 3.6, hauteur: 0.85, taille: 0.5, action: () => actions.nouvellePartie() });
-    const boutonSon = creerBouton("SON : OUI", { largeur: 2.3, hauteur: 0.7, taille: 0.5, action: () => actions.basculerSon() });
-    boutonSon.racine.position.set(0.65, -1.05, 0);
-    coinRacine.add(boutonNouvelle.racine, boutonSon.racine);
+    coinRacine.add(boutonNouvelle.racine);
+
+    /*
+     * Panneau de volume : pour la musique et pour les effets,
+     * un bouton "−", 5 crans cliquables (comme les barres de réseau d'un téléphone) et un bouton "+".
+     */
+    const panneauVolume = new THREE.Group();
+    panneauVolume.position.set(0, -1.55, 0);
+    const plancheVolume = new THREE.Mesh(new RoundedBoxGeometry(3.6, 1.75, 0.22, 3, 0.08), MAT.boisFonce);
+    panneauVolume.add(plancheVolume, clou(-1.62, 0.7, 0.12), clou(1.62, 0.7, 0.12));
+    coinRacine.add(panneauVolume);
+
+    const matCranPlein = MAT.laiton;
+    const matCranVide = new THREE.MeshStandardMaterial({ color: 0x2a1a10, roughness: 0.9 });
+    const reglages = {};
+
+    function petitBouton(texte, action) {
+        const groupe = new THREE.Group();
+        const disque = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.1, 24), MAT.laiton);
+        disque.rotation.x = Math.PI / 2;
+        const signe = panneauTexte(texte, { largeur: 0.4, hauteur: 0.4, taille: 0.8, couleur: "#3a1f0c", ombre: false, police: POLICE_TEXTE });
+        signe.position.z = 0.06;
+        groupe.add(disque, signe);
+        rendreCliquable([disque, signe], action, groupe);
+        return groupe;
+    }
+
+    [["musique", "MUSIQUE", 0.38], ["effets", "EFFETS", -0.42]].forEach(([canal, libelle, y]) => {
+        const ligne = new THREE.Group();
+        ligne.position.set(0, y, 0.12);
+
+        const titre = panneauTexte(libelle, { largeur: 1.25, hauteur: 0.4, taille: 0.62, couleur: "#ffe6b8", contour: "#2a1004", police: POLICE_TEXTE });
+        titre.position.x = -1.05;
+        ligne.add(titre);
+
+        const moins = petitBouton("−", () => changerVolume(canal, sons.niveau(canal) - 1));
+        moins.position.x = -0.22;
+        const plus = petitBouton("+", () => changerVolume(canal, sons.niveau(canal) + 1));
+        plus.position.x = 1.5;
+        ligne.add(moins, plus);
+
+        const crans = [];
+        for (let i = 0; i < sons.NIVEAU_MAX; i++) {
+            const hauteur = 0.14 + i * 0.07;
+            const cran = new THREE.Mesh(new THREE.BoxGeometry(0.16, hauteur, 0.08), matCranVide);
+            cran.position.set(0.12 + i * 0.25, hauteur / 2 - 0.2, 0);
+            ligne.add(cran);
+            // Cliquer sur un cran règle directement le niveau (cliquer sur le cran actif le coupe)
+            rendreCliquable([cran], () => {
+                const niveau = sons.niveau(canal) === i + 1 ? 0 : i + 1;
+                changerVolume(canal, niveau);
+            }, cran);
+            crans.push(cran);
+        }
+
+        panneauVolume.add(ligne);
+        reglages[canal] = crans;
+    });
+
+    function afficherVolume(canal) {
+        const niveau = sons.niveau(canal);
+        reglages[canal].forEach((cran, i) => {
+            cran.material = i < niveau ? matCranPlein : matCranVide;
+        });
+    }
+
+    function changerVolume(canal, niveau) {
+        sons.debloquer();
+        sons.reglerVolume(canal, niveau);
+        afficherVolume(canal);
+        if (canal === "effets") sons.bonne(); // petit son pour entendre le nouveau volume
+    }
+
+    afficherVolume("musique");
+    afficherVolume("effets");
     element("coin", coinRacine);
 
     /* =====================================================
@@ -374,7 +500,8 @@ export function creerInterface({ camera, canvas, sons, actions }) {
 
         // Coin : boutons en haut à droite
         const eCoin = elements.coin;
-        const sCoin = Math.min((hauteurVue * 0.16) / eCoin.hauteur, (largeurVue * 0.34) / eCoin.largeur);
+        // Sur téléphone, on l'agrandit : les crans du volume doivent rester faciles à toucher
+        const sCoin = Math.min((hauteurVue * 0.24) / eCoin.hauteur, (largeurVue * (portrait ? 0.5 : 0.3)) / eCoin.largeur);
         placer("coin", largeurVue / 2 - marge - (eCoin.largeur * sCoin) / 2, hauteurVue / 2 - marge - (0.45 * sCoin), sCoin);
 
         // Barillet en haut à gauche
@@ -387,12 +514,22 @@ export function creerInterface({ camera, canvas, sons, actions }) {
         const sCla = Math.min((largeurVue * 0.96) / eCla.largeur, (hauteurVue * (portrait ? 0.27 : 0.29)) / eCla.hauteur);
         placer("clavier", 0, -hauteurVue / 2 + marge + (eCla.hauteur * sCla) / 2, sCla);
 
-        // Mot : en haut au centre (sous les boutons du coin si l'écran est étroit)
+        // Mot : en haut au centre, entre le barillet et le coin s'il y a la place, sinon en dessous
         if (elements.mot) {
             const eMot = elements.mot;
-            const hautOccupe = portrait || camera.aspect < 1.5 ? hauteurVue * 0.21 : marge;
-            const sMot = Math.min((largeurVue * (portrait ? 0.95 : 0.6)) / eMot.largeur, (hauteurVue * 0.24) / eMot.hauteur);
-            placer("mot", 0, hauteurVue / 2 - hautOccupe - (1.7 * sMot), sMot, 0.2);
+            const largeurCotes = 2 * Math.max(eCoin.largeur * sCoin, eBar.largeur * sBar) + 4 * marge;
+            const placeEntre = largeurVue - largeurCotes;
+            const sEntre = Math.min(placeEntre / eMot.largeur, (hauteurVue * 0.24) / eMot.hauteur);
+            // En paysage (tablette), on limite sa hauteur pour ne pas cacher la potence
+            const sDessous = Math.min((largeurVue * 0.95) / eMot.largeur, (hauteurVue * (portrait ? 0.24 : 0.15)) / eMot.hauteur);
+
+            // On choisit "entre" seulement si le mot y reste assez grand
+            if (!portrait && sEntre >= sDessous * 0.75) {
+                placer("mot", 0, hauteurVue / 2 - marge - 1.7 * sEntre, sEntre, 0.2);
+            } else {
+                const hautOccupe = Math.max(eCoin.hauteur * sCoin, eBar.hauteur * sBar) + marge * 1.5;
+                placer("mot", 0, hauteurVue / 2 - hautOccupe - 1.7 * sDessous, sDessous, 0.2);
+            }
         }
 
         // Bannière de fin : à la place du clavier (qui se range), pour laisser voir le cowboy
@@ -491,7 +628,8 @@ export function creerInterface({ camera, canvas, sons, actions }) {
             const a = animerRessort(i.appui, dt);
             if (!i.touche) {
                 i.groupe.scale.setScalar(1 + s * 0.06 - a * 0.05);
-                i.groupe.position.z = -a * 0.12;
+                if (!i.groupe.userData.zDepart) i.groupe.userData.zDepart = i.groupe.position.z || 0.0001;
+                i.groupe.position.z = i.groupe.userData.zDepart - a * 0.12;
             }
         }
 
@@ -590,6 +728,7 @@ export function creerInterface({ camera, canvas, sons, actions }) {
             montrer("clavier", true);
             chuteBanniere.cible = 8;
             boutonNouvelle.interactif.actif = true;
+            boutonNouvelle.racine.visible = true;
             montrer("coin", true);
         },
 
@@ -671,11 +810,7 @@ export function creerInterface({ camera, canvas, sons, actions }) {
             chuteBanniere.valeur = 8;
             chuteBanniere.cible = 0;
             boutonNouvelle.interactif.actif = false;
-            montrer("coin", false);
-        },
-
-        changerSon(actif) {
-            boutonSon.libelle.userData.changerTexte(actif ? "SON : OUI" : "SON : NON");
+            boutonNouvelle.racine.visible = false; // le volume, lui, reste réglable
         },
 
         enJeu() {

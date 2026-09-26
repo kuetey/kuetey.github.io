@@ -90,7 +90,7 @@ export const PROJETS = [
                 nom: "v5 — Far West",
                 auteur: "moi + IA",
                 image: "assets/img/v5-farwest.jpg",
-                texte: "Expérience plein écran 100 % 3D : même l'interface est en 3D (clavier de machine à écrire aux touches rondes, tuiles qui se retournent, barillet de revolver). Caméra cinématique, bloom, shaders et sons générés par le code.",
+                texte: "Expérience plein écran 100 % 3D : même l'interface est en 3D (clavier de machine à écrire aux touches rondes, tuiles qui se retournent, vrai barillet de revolver dont les chambres se vident). Caméra cinématique, bloom, shaders, musique western et effets sonores générés par le code, volume réglable.",
                 technos: ["Three.js", "Shaders GLSL", "Post-traitement", "Raycasting", "Web Audio API"],
                 code: "sources/le-mot-mystere/v5_farwest",
                 jouer: "projets/le-mot-mystere-far-west/",
