@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<!--
+    LE MOT MYSTÈRE — v5 Far West
+
+    Une expérience plein écran, 100 % 3D :
+    - le décor, le personnage ET l'interface (mot, clavier, boutons) sont des objets Three.js ;
+    - le HTML ne sert qu'à l'écran de chargement et à l'accessibilité.
+
+    Fichiers :
+    js/jeu.js         règles du jeu (identiques à la v4)
+    js/mots.js        liste des mots
+    js/textures.js    dessine les textes et le bois dans des <canvas> utilisés comme textures
+    js/sons.js        effets sonores fabriqués avec la Web Audio API (aucun fichier audio)
+    js/decor.js       désert, ciel, saloon, cactus, virevoltants, vautours…
+    js/cowboy.js      la potence et le cowboy
+    js/interface3d.js l'interface de jeu en 3D (mot, clavier, barillet, boutons, bannière)
+    js/main.js        le chef d'orchestre : caméra, post-traitement, liens entre tout
+-->
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Le Mot Mystère — Far West</title>
+    <meta name="description" content="Jeu du pendu en 3D dans le Far West, réalisé avec Three.js.">
+    <meta name="theme-color" content="#2a1850">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rye&family=Special+Elite&display=swap">
+    <link rel="stylesheet" href="style.css">
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+            }
+        }
+    </script>
+</head>
+
+<body>
+
+<canvas id="scene" aria-hidden="true"></canvas>
+
+<!-- Écran de chargement -->
+<div class="loader" id="loader">
+    <p class="loader-title">Le Mot Mystère</p>
+    <p class="loader-sub">— Far West —</p>
+    <div class="loader-bar"><span id="loader-fill"></span></div>
+    <p class="loader-text" id="loader-text">Sellage des chevaux…</p>
+</div>
+
+<!-- Accessibilité : l'état du jeu est lu par les lecteurs d'écran -->
+<p class="sr-only" id="annonce" aria-live="polite"></p>
+
+<script type="module" src="js/main.js"></script>
+
+</body>
+</html>

@@ -51,7 +51,7 @@ export const PROJETS = [
     {
         id: "mot-mystere",
         titre: "Le Mot Mystère",
-        accroche: "Un jeu du pendu que je fais évoluer version après version : d'une page PHP à une interface de jeu animée, puis à une scène 3D temps réel.",
+        accroche: "Un jeu du pendu que je fais évoluer version après version : d'une page PHP à une interface de jeu animée, jusqu'à une expérience 3D plein écran au Far West.",
         versions: [
             {
                 nom: "v1 — Ma version",
@@ -86,6 +86,15 @@ export const PROJETS = [
                 code: "sources/le-mot-mystere/v4_threejs",
                 jouer: "projets/le-mot-mystere-3d/",
             },
+            {
+                nom: "v5 — Far West",
+                auteur: "moi + IA",
+                image: "assets/img/v5-farwest.jpg",
+                texte: "Expérience plein écran 100 % 3D : même l'interface est en 3D (clavier de machine à écrire aux touches rondes, tuiles qui se retournent, barillet de revolver). Caméra cinématique, bloom, shaders et sons générés par le code.",
+                technos: ["Three.js", "Shaders GLSL", "Post-traitement", "Raycasting", "Web Audio API"],
+                code: "sources/le-mot-mystere/v5_farwest",
+                jouer: "projets/le-mot-mystere-far-west/",
+            },
         ],
     },
 ];
@@ -108,7 +117,7 @@ export const A_VENIR = [
 
 export const COMPETENCES = [
     { groupe: "Interfaces", items: [["UI responsive", "acquis"], ["Animations / micro-interactions", "acquis"], ["Design system (couleurs, typo)", "en-cours"], ["Figma", "a-venir"]] },
-    { groupe: "3D temps réel", items: [["3D en CSS", "acquis"], ["Three.js / WebGL", "en-cours"], ["Unity 3D", "a-venir"], ["Shaders", "a-venir"]] },
+    { groupe: "3D temps réel", items: [["3D en CSS", "acquis"], ["Three.js / WebGL", "en-cours"], ["Shaders GLSL", "en-cours"], ["Post-traitement", "en-cours"], ["Unity 3D", "a-venir"]] },
     { groupe: "Front-end", items: [["HTML", "acquis"], ["CSS / animations", "acquis"], ["SVG", "acquis"], ["JavaScript", "en-cours"]] },
     { groupe: "Back-end", items: [["PHP", "en-cours"], ["Sessions / formulaires", "acquis"], ["SQL", "a-venir"], ["Symfony", "a-venir"]] },
     { groupe: "Jeu vidéo", items: [["Logique de jeu", "en-cours"], ["Phaser", "a-venir"], ["Unity / C#", "a-venir"]] },
